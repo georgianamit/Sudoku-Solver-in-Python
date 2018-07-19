@@ -52,18 +52,37 @@ def display():
 def gridIsValid(row, col, value):
     return boxIsValid(row, col, value) and rowIsValid(row, value) and colIsValid(col, value)
 
-def solveSudoku(row,col):
-    for i in range(row,9):
-        col = col % 9
-        for j in range(col,9):
+def isSolved():
+    for i in range(9):
+        for j in range(9):
             if grid[i][j] == 0:
-                for k in range(1,10):                   
-                    if gridIsValid(i, j, k):
-                        grid[i][j] = k
-                        display()
-                        solveSudoku(i, j+1)
+                return False
+    else:
+        return True
 
+def solveSudoku(row,col):
+    if isSolved():
+        return True
+    else:
+        for i in range(row,9):
+            col = col % 9
+            for j in range(col,9):
+                if grid[i][j] == 0:
+                    for k in range(1,10):                                           
+                        if gridIsValid(i, j, k):
+                            grid[i][j] = k
+                            # display()                           
+                            if solveSudoku(i, j+1):
+                                return True
+                            grid[i][j] = 0
+                    else:
+                        return False
+def main():
+    if solveSudoku(0,0):
+        display()
+    else:
+        print("No Solution")
 
-solveSudoku(0,0)
-display()
+if __name__ == "__main__":        
+    main()
 
