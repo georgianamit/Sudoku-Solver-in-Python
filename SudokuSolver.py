@@ -1,28 +1,21 @@
-grid = [[3,0,6,5,0,8,4,0,0],
-        [5,2,0,0,0,0,0,0,0],
-        [0,8,7,0,0,0,0,3,1],
-        [0,0,3,0,1,0,0,8,0],
-        [9,0,0,8,6,3,0,0,5],
-        [0,5,0,0,9,0,6,0,0],
-        [1,3,0,0,0,0,2,5,0],
-        [0,0,0,0,0,0,0,7,4],
-        [0,0,5,2,0,6,3,0,0]]
-
-def colIsValid(col, value):
+# function for checking whether the column is valid or not
+def colIsValid(grid, col, value):
     for i in range(9):
         if grid[i][col] == value:
             return False
     else:
         return True
 
-def rowIsValid(row, value):
+# function for checking whether the row is valid or not
+def rowIsValid(grid, row, value):
     for i in range(9):
         if grid[row][i] == value:
             return False
     else:
         return True
 
-def boxIsValid(row, col, value):
+# function for checking whether the small 3 X 3 box is valid or not
+def boxIsValid(grid, row, col, value):
     box_row = getBox(row)
     box_col = getBox(col)
     for i in range(0,3):
@@ -34,6 +27,7 @@ def boxIsValid(row, col, value):
     else:
         return True
 
+# # function for getting the small boxes starting row and column
 def getBox(n):
     if n in range(0,3):
         return 0
@@ -42,44 +36,60 @@ def getBox(n):
     if n in range(6,9):
         return 2
 
-def display():
+# function for displaying the sudoku board
+def display(grid):
     for i in range(9):
         for j in range(9):
             print(grid[i][j]," ",end="")
         print()
     print()
 
-def gridIsValid(row, col, value):
-    return boxIsValid(row, col, value) and rowIsValid(row, value) and colIsValid(col, value)
+# function for checking whether the sudoku board(grid) is valid or not
+def gridIsValid(grid,row, col, value):
+    return boxIsValid(grid, row, col, value) and rowIsValid(grid, row, value) and colIsValid(grid, col, value)
 
-def isSolved():
+# function for getting the unassigned locations
+def getUnassignedLocation(grid,d):
     for i in range(9):
         for j in range(9):
             if grid[i][j] == 0:
-                return False
+                d['row'] = i
+                d['col'] = j
+                return True
     else:
-        return True
+        return False    
 
-def solveSudoku(row,col):
-    if isSolved():
+# recursive function for solving the sudoku using backtracking
+def solveSudoku(grid):
+    d = {'row': 0, 'col': 0}
+
+    if not getUnassignedLocation(grid, d):
         return True
+    
+    for k in range(1,10):                                           
+        if gridIsValid(grid, d['row'], d['col'], k):
+            grid[d['row']][d['col']] = k
+            # display(grid)                                        
+            if solveSudoku(grid):
+                return True
+            grid[d['row']][d['col']] = 0
     else:
-        for i in range(row,9):
-            col = col % 9
-            for j in range(col,9):
-                if grid[i][j] == 0:
-                    for k in range(1,10):                                           
-                        if gridIsValid(i, j, k):
-                            grid[i][j] = k
-                            # display()                           
-                            if solveSudoku(i, j+1):
-                                return True
-                            grid[i][j] = 0
-                    else:
-                        return False
-def main():
-    if solveSudoku(0,0):
-        display()
+        return False
+
+# main function
+def main():  
+    grid = [[0, 0, 0, 2, 6, 0, 7, 0, 1],
+            [6, 8, 0, 0, 7, 0, 0, 9, 0],
+            [1, 9, 0, 0, 0, 4, 5, 0, 0],
+            [8, 2, 0, 1, 0, 0, 0, 4, 0],
+            [0, 0, 4, 6, 0, 2, 9, 0, 0],
+            [0, 5, 0, 0, 0, 3, 0, 2, 8],
+            [0, 0, 9, 3, 0, 0, 0, 7, 4],
+            [0, 4, 0, 0, 5, 0, 0, 3, 6],
+            [7, 0, 3, 0, 1, 8, 0, 0, 0]]
+    
+    if solveSudoku(grid):
+        display(grid)
     else:
         print("No Solution")
 
